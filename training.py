@@ -1,6 +1,7 @@
 import os
 from pydub import AudioSegment
 from pathlib import Path
+from pydub.silence import trim_silence
 
 #segments audio files based on timestamps
 
@@ -28,6 +29,15 @@ def segment_audio(input_dir, output_dir):
 
                     segment = segment.set_frame_rate(16000).set_channels(1) #standardize sample rate and audio channel
                     # save segment
+
+                    if len(segment) < 500: #filters out clips shorter than 500 ms
+                        continue
+                    
+                    gain = -22.0 - segment.dBFS #normalize audio to -22 db target (sounds louder without too much distortion)
+                    segment = segment.apply_gain(gain)
+
+                    segment = trim_silence(segment, silence_thresh=-40, padding_ms=200) #trim leading and trailing silence (safer than trimming silence in between words)
+
                     folder_name = txt_file.parent.name
                     seg_filename = f"{folder_name}_{i}.wav"
                     seg_path = os.path.join(output_dir, seg_filename)
@@ -38,4 +48,4 @@ def segment_audio(input_dir, output_dir):
 
     print(f"Segmented: {input_dir}")
 
-segment_audio("data/train", "processed/train")
+segment_audio("data/train", "processed2/train")
