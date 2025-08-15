@@ -63,4 +63,4 @@ def segment_audio(input_dir, output_dir):
 
     print(f"Segmented: {input_dir}")
 
-segment_audio("data/train", "processed/train")
+segment_audio("data/test", "processed/test")
