@@ -2,7 +2,7 @@ from transformers import WhisperProcessor, WhisperForConditionalGeneration
 from datasets import load_dataset
 import soundfile as sf  
 
-processor = WhisperProcessor.from_pretrained("openai/whisper-base")
+processor = WhisperProcessor.from_pretrained("openai/whisper-base", language="en", task="transcribe")
 model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-base")
 
 dataset = load_dataset(
@@ -15,7 +15,7 @@ def prepare_dataset(batch):
     audio_array, sampling_rate = sf.read(batch["path"])
 
     batch["input_features"] = processor.feature_extractor(
-        audio_array, sampling_rate=sampling_rate
+        audio_array, sampling_rate=16000
     ).input_features[0]
 
     batch["labels"] = processor.tokenizer(batch["text"]).input_ids

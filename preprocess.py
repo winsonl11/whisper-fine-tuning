@@ -3,6 +3,7 @@ from pathlib import Path
 import librosa
 import soundfile as sf
 import numpy as np
+import re
 
 def segment_audio(input_dir, output_dir):
     os.makedirs(output_dir, exist_ok=True)
@@ -51,16 +52,31 @@ def segment_audio(input_dir, output_dir):
                         gain = target_rms / rms
                         segment = segment * gain
 
-                    # Save segment as WAV
+                    # save segment as WAV
                     folder_name = txt_file.parent.name
                     seg_filename = f"{folder_name}_{i}.wav"
                     seg_path = os.path.join(output_dir, seg_filename)
 
                     sf.write(seg_path, segment, sr)
-
-                    # Save transcript mapping
+                    text = normalize_text(text)
+                    # save transcript mapping
                     meta_file.write(f"{seg_path},{text}\n")
 
     print(f"Segmented: {input_dir}")
+
+def normalize_text(text: str) -> str:
+    # lowercase
+    text = text.lower()
+
+    # remove punctuation
+    text = re.sub(r"[^\w\s']", "", text)
+
+    # collapse multiple spaces
+    text = re.sub(r"\s+", " ", text)
+
+    # strip leading/trailing spaces
+    text = text.strip()
+
+    return text
 
 segment_audio("data/test", "processed/test")
