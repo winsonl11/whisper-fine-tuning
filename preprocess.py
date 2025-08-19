@@ -45,10 +45,10 @@ def segment_audio(input_dir, output_dir):
                         segment = librosa.resample(segment, orig_sr=sr, target_sr=target_sr)
                         sr = target_sr
 
-                    # normalize segment to -20 dB
+                    # normalize segment to -20 dBFS
                     rms = np.sqrt(np.mean(segment**2))
                     if rms > 0:
-                        target_rms = 10**(-20 / 20)  # Convert dB to linear RMS
+                        target_rms = 10**(-20 / 20)  # Convert dBFS to linear RMS
                         gain = target_rms / rms
                         segment = segment * gain
 
